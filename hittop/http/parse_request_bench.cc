@@ -31,8 +31,8 @@ int main(int argc, char **argv) {
     std::memcpy(&buffer[i * request_size], contents.str().c_str(),
                 request_size);
   }
-  char *next = &buffer[0];
   for (int j = 0; j < 10; ++j) {
+    const char *next = &buffer[0];
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < count; ++i) {
       hittop::http::ZeroCopyRequest<const char *> request;
@@ -40,7 +40,9 @@ int main(int argc, char **argv) {
           boost::make_iterator_range(next, next + request_size), &request);
       if (!result.ok()) {
         std::cerr << "Fail!" << std::endl;
+        return 1;
       }
+      next = result.get();
     }
     auto stop = std::chrono::high_resolution_clock::now();
     double usec =
